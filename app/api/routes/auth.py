@@ -1,21 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, EmailStr
 from app.core.db import get_collection
 from app.core.security import hash_password, verify_password, create_token, get_current_user
+from app.models.users import Register, Login
 
 router = APIRouter()
 users = get_collection("users")
-
-
-class Register(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class Login(BaseModel):
-    email: EmailStr
-    password: str
-
 
 @router.post("/register")
 async def register(data: Register):
@@ -23,6 +12,7 @@ async def register(data: Register):
         raise HTTPException(400, "Email already exists")
 
     await users.insert_one({
+        "username": data.username,
         "email": data.email,
         "password": hash_password(data.password)
     })

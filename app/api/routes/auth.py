@@ -14,7 +14,8 @@ async def register(data: Register):
     await users.insert_one({
         "username": data.username,
         "email": data.email,
-        "password": hash_password(data.password)
+        "password": hash_password(data.password),
+        "role": data.role or "member"
     })
 
     token = create_token(data.email)
@@ -23,7 +24,7 @@ async def register(data: Register):
 
 
 @router.post("/login")
-async def login(data: Login):
+async def login(data: Login):    
     user = await users.find_one({"email": data.email})
     if not user or not verify_password(data.password, user["password"]):
         raise HTTPException(401, "Invalid credentials")

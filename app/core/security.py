@@ -1,5 +1,5 @@
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
 from fastapi import Depends, HTTPException
@@ -21,7 +21,7 @@ def verify_password(password: str, hashed: str) -> bool:
 def create_token(email: str) -> str:
     payload = {
         "sub": email,
-        "exp": datetime.utcnow() + timedelta(hours=1)
+        "exp": datetime.now(timezone.utc) + timedelta(hours=1)
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 

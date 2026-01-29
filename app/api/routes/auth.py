@@ -11,12 +11,10 @@ async def register(data: Register):
     if await users.find_one({"email": data.email}):
         raise HTTPException(400, "Email already exists")
 
-    await users.insert_one({
-        "username": data.username,
-        "email": data.email,
-        "password": hash_password(data.password),
-        "role": data.role or "member"
-    })
+    new_user = data.model_dump()
+    new_user["password"] = hash_password(data.password)
+
+    await users.insert_one(new_user)
 
     token = create_token(data.email)
 

@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, Field
 from typing import Literal, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -14,11 +14,14 @@ class UserBase(BaseModel):
 
 class Register(UserBase):
     username: str
-    role: Literal["admin", "member"] = "member"
+    role: Literal["admin", "member"] = Field(default="member")
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
     bio: Optional[str] = None
     phone_number: Optional[str] = None
+        
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Login(UserBase):
     pass

@@ -19,7 +19,7 @@ async def register(data: Register):
 
     token = create_token(data.email)
 
-    return {"access_token": token, "token_type": "bearer", "message": "User registered successfully", "user": {"username": data.username, "email": data.email}}
+    return {"access_token": token, "token_type": "bearer", "message": "User registered successfully"}
 
 
 @router.post("/login")

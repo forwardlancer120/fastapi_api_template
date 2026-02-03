@@ -18,9 +18,9 @@ def verify_password(password: str, hashed: str) -> bool:
     return password_hash.verify(password, hashed)
 
 
-def create_token(email: str) -> str:
+def create_token(user_id: str) -> str:
     payload = {
-        "sub": email,
+        "sub": user_id,
         "exp": datetime.now(timezone.utc) + timedelta(hours=1)
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")

@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from app.core.db import get_collection
-from app.core.security import hash_password, verify_password, create_token, get_current_user
-from app.models.users import Register, Login
+from app.core.security import hash_password, verify_password, create_token
+from app.models.user import Register, Login
 from pymongo.errors import PyMongoError
 
-router = APIRouter()
+router = APIRouter(prefix='/auth', tags=['auth'])
 users = get_collection("users")
 
 @router.post("/register")
@@ -21,8 +21,8 @@ async def register(data: Register):
             raise HTTPException(status_code=500, detail="Failed to create user")
     except PyMongoError as e:
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
-
-    token = create_token(data.email)
+    
+    token = create_token(str(result.inserted_id))
 
     return {"access_token": token, "token_type": "bearer", "message": "User registered successfully"}
 
@@ -33,12 +33,7 @@ async def login(data: Login):
 
     if not user or not verify_password(data.password, user["password"]):
         raise HTTPException(401, "Invalid credentials")
-
-    token = create_token(data.email)
+    
+    token = create_token(str(user['_id']))
     
     return {"access_token": token, "token_type": "bearer"}
-
-
-@router.get("/me")
-async def me(current_user: str = Depends(get_current_user)):
-    return {"email": current_user}
